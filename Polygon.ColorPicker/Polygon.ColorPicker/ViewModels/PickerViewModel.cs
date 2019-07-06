@@ -9,6 +9,7 @@ using Polygon.ColorPicker.Interfaces;
 using Polygon.Models.Enums;
 using Polygon.ColorPicker.Extensions;
 using Polygon.Utils;
+using Polygon.Utils.Extensions;
 
 namespace Polygon.ColorPicker.ViewModels
 {
@@ -82,22 +83,10 @@ namespace Polygon.ColorPicker.ViewModels
 
                     if (dialog.ShowDialog() == DialogResult.OK)
                     {
-                        ColorBrush = new SolidColorBrush(new Color
-                        {
-                            A = dialog.Color.A,
-                            B = dialog.Color.B,
-                            G = dialog.Color.G,
-                            R = dialog.Color.R
-                        });
+                        ColorBrush = new SolidColorBrush(dialog.CreateColorFromDialog());
                     }
 
-                    ColorDisplayContent = HexConverter(new Color
-                    {
-                        A = dialog.Color.A,
-                        B = dialog.Color.B,
-                        G = dialog.Color.G,
-                        R = dialog.Color.R
-                    });
+                    ColorDisplayContent = HexConverter(dialog.CreateColorFromDialog());
                 }));
             }
         }

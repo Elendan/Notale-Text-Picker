@@ -90,8 +90,21 @@ namespace Polygon.ColorPicker.ViewModels
                             R = dialog.Color.R
                         });
                     }
+
+                    ColorDisplayContent = HexConverter(new Color
+                    {
+                        A = dialog.Color.A,
+                        B = dialog.Color.B,
+                        G = dialog.Color.G,
+                        R = dialog.Color.R
+                    });
                 }));
             }
+        }
+
+        private static string HexConverter(Color c)
+        {
+            return "#" + c.R.ToString("X2") + c.G.ToString("X2") + c.B.ToString("X2") + c.A.ToString("x2");
         }
     }
 }

@@ -3,19 +3,20 @@ using System.Configuration;
 using System.IO;
 using System.Windows.Forms;
 using System.Windows.Input;
+using System.Windows.Media;
 using Polygon.ColorPicker.Events;
 using Polygon.ColorPicker.Interfaces;
 using Polygon.Models.Enums;
+using Polygon.ColorPicker.Extensions;
 using Polygon.Utils;
 
 namespace Polygon.ColorPicker.ViewModels
 {
     public class PickerViewModel : BaseViewModel, IPageViewModel
     {
-        private const string EXE_FILTER = "Executable (NostaleClientX.exe)|NostaleClientX.exe";
-
         public PickerViewModel()
         {
+            this.InitializeKeys();
             var data = ConfigurationManager.AppSettings["NostaleClientXPath"];
             if (string.IsNullOrEmpty(data) || !File.Exists(data))
             {
@@ -31,15 +32,64 @@ namespace Polygon.ColorPicker.ViewModels
             }
         }
 
-        private ICommand _testPattern;
+        private const string EXE_FILTER = "Executable (NostaleClientX.exe)|NostaleClientX.exe";
 
-        public ICommand TestPattern
+        private string _pickerButtonContent;
+
+        public string PickerButtonContent
+        {
+            get => _pickerButtonContent;
+            set
+            {
+                _pickerButtonContent = value;
+                OnPropertyChanged(nameof(PickerButtonContent));
+            }
+        }
+
+        private string _colorDisplayContent;
+
+        public string ColorDisplayContent
+        {
+            get => _colorDisplayContent;
+            set
+            {
+                _colorDisplayContent = value;
+                OnPropertyChanged(nameof(ColorDisplayContent));
+            }
+        }
+
+        private Brush _colorBrush;
+
+        public Brush ColorBrush
+        {
+            get => _colorBrush;
+            set
+            {
+                _colorBrush = value;
+                OnPropertyChanged(nameof(ColorBrush));
+            }
+        }
+
+        private ICommand _chooseColorCommand;
+
+        public ICommand ChooseColorCommand
         {
             get
             {
-                return _testPattern ?? (_testPattern = new RelayCommand(x =>
+                return _chooseColorCommand ?? (_chooseColorCommand = new RelayCommand(x =>
                 {
-                    Mediator.Notify(ScreenEventType.GoToMainView, null);
+                    var dialog = new ColorDialog();
+
+                    if (dialog.ShowDialog() == DialogResult.OK)
+                    {
+                        ColorBrush = new SolidColorBrush(new Color
+                        {
+                            A = dialog.Color.A,
+                            B = dialog.Color.B,
+                            G = dialog.Color.G,
+                            R = dialog.Color.R
+                        });
+                    }
                 }));
             }
         }

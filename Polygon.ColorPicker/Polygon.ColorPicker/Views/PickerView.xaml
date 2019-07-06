@@ -7,7 +7,5 @@
              xmlns:viewModels="clr-namespace:Polygon.ColorPicker.ViewModels"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <Grid d:DataContext="{d:DesignInstance viewModels:PickerViewModel}">
-        <Button Width="150" Height="20" Content="Test MVVM pattern" Command="{Binding TestPattern}"></Button>
-    </Grid>
+    <Grid d:DataContext="{d:DesignInstance viewModels:PickerViewModel}"/>
 </UserControl>

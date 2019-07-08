@@ -34,7 +34,7 @@ namespace Polygon.Utils
             var byteData = Deserialization.ReadFully(new FileStream(_nostalePath, FileMode.Open));
             _oldHexToString.Add(byteData.ToHexString());
 
-            if (!_oldHexToString.Any(s => s.Contains(_oldColor)))
+            if (!_oldHexToString.Any(s => s.Contains($"00FFFFFF{_oldColor}0000009F")))
             {
                 return false;
             }

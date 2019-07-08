@@ -20,4 +20,7 @@ That will automatically create a backup in your nostale folder with the followin
 
 ![](https://i.imgur.com/ogPWqnu.png)
 
+### Thanks 
 
+Cryless : For releasing a "How To" to update the color of the GM Tag
+Fizo55 : Created a first console version of that tool

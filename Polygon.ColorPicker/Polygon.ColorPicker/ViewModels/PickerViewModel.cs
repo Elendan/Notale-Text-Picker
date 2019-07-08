@@ -46,11 +46,27 @@ namespace Polygon.ColorPicker.ViewModels
             }
         }
 
+        private readonly string _oldRightClickColor = ConfigurationManager.AppSettings["CurrentRightClickColor"];
+
+        private readonly string _oldGmColor = ConfigurationManager.AppSettings["CurrentGmColor"];
+
         private readonly string _nostalePath = string.Empty;
 
         public static bool IsAdministrator => new WindowsPrincipal(WindowsIdentity.GetCurrent()).IsInRole(WindowsBuiltInRole.Administrator);
 
         private const string EXE_FILTER = "Executable (*.exe)|*.exe";
+
+        public string _changePrincipalRightClickTextContent;
+
+        public string ChangePrincipalRightClickTextContent
+        {
+            get => _changePrincipalRightClickTextContent;
+            set
+            {
+                _changePrincipalRightClickTextContent = value;
+                OnPropertyChanged(nameof(ChangePrincipalRightClickTextContent));
+            }
+        }
 
         private string _changeGmTagButtonContent;
 
@@ -128,31 +144,50 @@ namespace Polygon.ColorPicker.ViewModels
             {
                 return _changeGmTagCommand ?? (_changeGmTagCommand = new RelayCommand(x =>
                 {
-                    const string backupName = "LauncherBackup";
-                    var directory = _nostalePath.FindDirectory();
-
-                    if (!Directory.Exists(directory + backupName))
-                    {
-                        Directory.CreateDirectory(directory + backupName);
-                    }
-
-                    var currentDirectoryTime = directory + backupName + $"\\{DateTime.Now:yyyyMdd_HHmmss}";
-
-                    Directory.CreateDirectory(currentDirectoryTime);
-
-                    File.Copy(_nostalePath, currentDirectoryTime + $"\\{_nostalePath.Split('\\').Last()}", true);
-                    var hexFinder = new HexFinder(_nostalePath, ColorDisplayContent);
-
-                    if (!hexFinder.ReplaceColorPattern())
-                    {
-                        MessageBox.Show("An error occurred !");
-                        return;
-                    }
-
-                    SettingsManager.AddOrUpdateAppSettings("CurrentColor", ColorDisplayContent);
-                    MessageBox.Show("Backup created, value changed successfully !");
+                    UpdateInformationFromPattern("CurrentGmColor", $"00FFFFFF{_oldGmColor}0000009F", _oldGmColor);
                 }));
             }
+        }
+
+        public ICommand _changePrincipalRightClickTextCommand;
+
+        public ICommand ChangePrincipalRightClickTextCommand
+        {
+            get
+            {
+                return _changePrincipalRightClickTextCommand ?? (_changePrincipalRightClickTextCommand = new RelayCommand(x =>
+                {
+                    UpdateInformationFromPattern("CurrentRightClickColor", $"C7466F{_oldRightClickColor}C6466E", _oldRightClickColor);
+                }));
+            }
+        }
+
+        private void UpdateInformationFromPattern(string appSettingKey, string pattern, string color)
+        {
+            const string backupName = "LauncherBackup";
+            var directory = _nostalePath.FindDirectory();
+
+            if (!Directory.Exists(directory + backupName))
+            {
+                Directory.CreateDirectory(directory + backupName);
+            }
+
+            var currentDirectoryTime = directory + backupName + $"\\{DateTime.Now:yyyyMdd_HHmmss}";
+
+            Directory.CreateDirectory(currentDirectoryTime);
+
+            File.Copy(_nostalePath, currentDirectoryTime + $"\\{_nostalePath.Split('\\').Last()}", true);
+
+            var hexFinder = new HexFinder(_nostalePath, ColorDisplayContent);
+
+            if (!hexFinder.ReplaceColorPattern(pattern, color))
+            {
+                MessageBox.Show("An error occurred !");
+                return;
+            }
+
+            SettingsManager.AddOrUpdateAppSettings(appSettingKey, ColorDisplayContent);
+            MessageBox.Show("Backup created, value changed successfully !");
         }
     }
 }

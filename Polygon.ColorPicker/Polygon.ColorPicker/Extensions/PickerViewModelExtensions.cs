@@ -12,15 +12,13 @@ namespace Polygon.ColorPicker.Extensions
 {
     public static class PickerViewModelExtensions
     {
-        private static readonly string _currentColor = ConfigurationManager.AppSettings["CurrentGmColor"];
-
         public static void InitializeKeys(this PickerViewModel model)
         {
-            model.ColorDisplayContent = _currentColor;
+            model.ColorDisplayContent = "Color hex preview";
             model.PickerButtonContent = "Choose color";
             model.ChangeGmTagButtonContent = "Change GM Tag";
             model.ChangePrincipalRightClickTextContent = "Change right click text";
-            model.ColorBrush = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#" + _currentColor));
+            model.ColorBrush = Brushes.Black;
         }
     }
 }

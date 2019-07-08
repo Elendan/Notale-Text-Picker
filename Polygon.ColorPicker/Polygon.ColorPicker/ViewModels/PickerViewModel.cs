@@ -55,9 +55,9 @@ namespace Polygon.ColorPicker.ViewModels
 
         #region Members
 
-        private readonly string _oldRightClickColor = ConfigurationManager.AppSettings["CurrentRightClickColor"];
+        private string _oldRightClickColor => ConfigurationManager.AppSettings["CurrentRightClickColor"];
 
-        private readonly string _oldGmColor = ConfigurationManager.AppSettings["CurrentGmColor"];
+        private string _oldGmColor => ConfigurationManager.AppSettings["CurrentGmColor"];
 
         private readonly string _nostalePath = string.Empty;
 

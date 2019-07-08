@@ -48,7 +48,9 @@
     <Compile Include="Deserialization.cs" />
     <Compile Include="Extensions\ByteArrayExtensions.cs" />
     <Compile Include="Extensions\ColorDialogExtensions.cs" />
+    <Compile Include="Extensions\ColorExtensions.cs" />
     <Compile Include="Extensions\StringExtensions.cs" />
+    <Compile Include="HexFinder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SettingsManager.cs" />
   </ItemGroup>

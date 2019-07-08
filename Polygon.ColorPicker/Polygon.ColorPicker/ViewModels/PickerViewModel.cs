@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Configuration;
 using System.IO;
+using System.Linq;
+using System.Security.Principal;
 using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -17,6 +19,12 @@ namespace Polygon.ColorPicker.ViewModels
     {
         public PickerViewModel()
         {
+            if (!IsAdministrator)
+            {
+                MessageBox.Show($"Please run this program as administrator");
+                Application.Exit();
+            }
+
             this.InitializeKeys();
             var data = ConfigurationManager.AppSettings["NostaleClientXPath"];
             if (string.IsNullOrEmpty(data) || !File.Exists(data))
@@ -28,12 +36,33 @@ namespace Polygon.ColorPicker.ViewModels
                 };
                 if (dlg.ShowDialog() == DialogResult.OK)
                 {
+                    _nostalePath = dlg.FileName;
                     SettingsManager.AddOrUpdateAppSettings("NostaleClientXPath", dlg.FileName);
                 }
             }
+            else
+            {
+                _nostalePath = data;
+            }
         }
 
+        private readonly string _nostalePath = string.Empty;
+
+        public static bool IsAdministrator => new WindowsPrincipal(WindowsIdentity.GetCurrent()).IsInRole(WindowsBuiltInRole.Administrator);
+
         private const string EXE_FILTER = "Executable (NostaleClientX.exe)|NostaleClientX.exe";
+
+        private string _changeGmTagButtonContent;
+
+        public string ChangeGmTagButtonContent
+        {
+            get => _changeGmTagButtonContent;
+            set
+            {
+                _changeGmTagButtonContent = value;
+                OnPropertyChanged(nameof(ChangeGmTagButtonContent));
+            }
+        }
 
         private string _pickerButtonContent;
 
@@ -86,14 +115,36 @@ namespace Polygon.ColorPicker.ViewModels
                         ColorBrush = new SolidColorBrush(dialog.CreateColorFromDialog());
                     }
 
-                    ColorDisplayContent = HexConverter(dialog.CreateColorFromDialog());
+                    ColorDisplayContent = dialog.CreateColorFromDialog().ToNostaleFormat();
                 }));
             }
         }
 
-        private static string HexConverter(Color c)
+        private ICommand _changeGmTagCommand;
+
+        public ICommand ChangeGmTagCommand
         {
-            return "#" + c.R.ToString("X2") + c.G.ToString("X2") + c.B.ToString("X2") + c.A.ToString("x2");
+            get
+            {
+                return _changeGmTagCommand ?? (_changeGmTagCommand = new RelayCommand(x =>
+                {
+                    var backupName = "LauncherBackup";
+                    var directory = _nostalePath.FindDirectory();
+
+                    if (!Directory.Exists(directory + backupName))
+                    {
+                        Directory.CreateDirectory(directory + backupName);
+                    }
+
+                    var currentDirectoryTime = directory + backupName + $"\\{DateTime.Now:yyyyMdd_HHmmss}";
+
+                    Directory.CreateDirectory(currentDirectoryTime);
+
+                    File.Copy(_nostalePath, currentDirectoryTime + $"\\{_nostalePath.Split('\\').Last()}", true);
+
+                    MessageBox.Show(directory + DateTime.Now.ToString("yyyyMdd_HH:mm:ss"));
+                }));
+            }
         }
     }
 }

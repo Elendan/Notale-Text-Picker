@@ -64,9 +64,9 @@ namespace Polygon.ColorPicker.ViewModels
             CurrentPageViewModel = PageViewModels.FirstOrDefault(vm => vm == viewModel);
         }
 
-        private static void OnGoToMainView(object obj)
+        private void OnGoToMainView(object data)
         {
-            MessageBox.Show("MVVM PATTERN WORKS");
+            CurrentPageViewModel = PageViewModels[0];
         }
     }
 }

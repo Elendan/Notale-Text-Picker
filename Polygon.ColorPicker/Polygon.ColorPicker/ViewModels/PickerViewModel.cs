@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.ObjectModel;
 using System.Configuration;
 using System.IO;
 using System.Linq;
@@ -17,6 +18,8 @@ namespace Polygon.ColorPicker.ViewModels
 {
     public class PickerViewModel : BaseViewModel, IPageViewModel
     {
+        #region Constructor
+
         public PickerViewModel()
         {
             if (!IsAdministrator)
@@ -25,7 +28,7 @@ namespace Polygon.ColorPicker.ViewModels
                 Application.Exit();
             }
 
-            this.InitializeKeys();
+            this.InitializeUi();
             var data = ConfigurationManager.AppSettings["LauncherPath"];
             if (string.IsNullOrEmpty(data) || !File.Exists(data))
             {
@@ -34,11 +37,13 @@ namespace Polygon.ColorPicker.ViewModels
                 {
                     Filter = EXE_FILTER
                 };
-                if (dlg.ShowDialog() == DialogResult.OK)
+                if (dlg.ShowDialog() != DialogResult.OK)
                 {
-                    _nostalePath = dlg.FileName;
-                    SettingsManager.AddOrUpdateAppSettings("LauncherPath", dlg.FileName);
+                    return;
                 }
+
+                _nostalePath = dlg.FileName;
+                SettingsManager.AddOrUpdateAppSettings("LauncherPath", dlg.FileName);
             }
             else
             {
@@ -46,25 +51,33 @@ namespace Polygon.ColorPicker.ViewModels
             }
         }
 
-        private readonly string _oldRightClickColor = ConfigurationManager.AppSettings["CurrentRightClickColor"];
+        #endregion
 
-        private readonly string _oldGmColor = ConfigurationManager.AppSettings["CurrentGmColor"];
+        #region Members
+
+        private string _oldRightClickColor => ConfigurationManager.AppSettings["CurrentRightClickColor"];
+
+        private string _oldGmColor => ConfigurationManager.AppSettings["CurrentGmColor"];
 
         private readonly string _nostalePath = string.Empty;
 
-        public static bool IsAdministrator => new WindowsPrincipal(WindowsIdentity.GetCurrent()).IsInRole(WindowsBuiltInRole.Administrator);
+        private static bool IsAdministrator => new WindowsPrincipal(WindowsIdentity.GetCurrent()).IsInRole(WindowsBuiltInRole.Administrator);
 
         private const string EXE_FILTER = "Executable (*.exe)|*.exe";
 
-        public string _changePrincipalRightClickTextContent;
+        #endregion
 
-        public string ChangePrincipalRightClickTextContent
+        #region UpdateableProperties
+
+        private string _changeRightClickColorContent;
+
+        public string ChangeRightClickColorContent
         {
-            get => _changePrincipalRightClickTextContent;
+            get => _changeRightClickColorContent;
             set
             {
-                _changePrincipalRightClickTextContent = value;
-                OnPropertyChanged(nameof(ChangePrincipalRightClickTextContent));
+                _changeRightClickColorContent = value;
+                OnPropertyChanged(nameof(ChangeRightClickColorContent));
             }
         }
 
@@ -116,6 +129,10 @@ namespace Polygon.ColorPicker.ViewModels
             }
         }
 
+        #endregion
+
+        #region ICommands
+
         private ICommand _chooseColorCommand;
 
         public ICommand ChooseColorCommand
@@ -144,25 +161,48 @@ namespace Polygon.ColorPicker.ViewModels
             {
                 return _changeGmTagCommand ?? (_changeGmTagCommand = new RelayCommand(x =>
                 {
-                    UpdateInformationFromPattern("CurrentGmColor", $"00FFFFFF{_oldGmColor}0000009F", _oldGmColor);
+                    var previous = "00FFFFFF";
+                    UpdateInformationFromPattern("CurrentGmColor", $"{previous}{_oldGmColor}", previous.Length);
                 }));
             }
         }
 
-        public ICommand _changePrincipalRightClickTextCommand;
+        private ICommand _changeRightClickColorCommand;
 
-        public ICommand ChangePrincipalRightClickTextCommand
+        public ICommand ChangeRightClickColorCommand
         {
             get
             {
-                return _changePrincipalRightClickTextCommand ?? (_changePrincipalRightClickTextCommand = new RelayCommand(x =>
+                return _changeRightClickColorCommand ?? (_changeRightClickColorCommand = new RelayCommand(x =>
                 {
-                    UpdateInformationFromPattern("CurrentRightClickColor", $"C7466F{_oldRightClickColor}C6466E", _oldRightClickColor);
+                    var previous = "C7466F";
+                    UpdateInformationFromPattern("CurrentRightClickColor", $"{previous}{_oldRightClickColor}", previous.Length);
                 }));
             }
         }
 
-        private void UpdateInformationFromPattern(string appSettingKey, string pattern, string color)
+        private ICommand _resetOptionsCommand;
+
+        public ICommand ResetOptionsCommand
+        {
+            get
+            {
+                return _resetOptionsCommand ?? (_resetOptionsCommand = new RelayCommand(x =>
+                {
+                    SettingsManager.AddOrUpdateAppSettings("LauncherPath", string.Empty);
+                    SettingsManager.AddOrUpdateAppSettings("CurrentGmColor", "FF6CBFFF");
+                    SettingsManager.AddOrUpdateAppSettings("CurrentRightClickColor", "78C4F5FF");
+                    MessageBox.Show("Settings have been reset. This program will close");
+                    System.Windows.Application.Current.Shutdown();
+                }));
+            }
+        }
+
+        #endregion
+
+        #region Methods
+
+        private void UpdateInformationFromPattern(string appSettingKey, string pattern, int substringIndex)
         {
             const string backupName = "LauncherBackup";
             var directory = _nostalePath.FindDirectory();
@@ -180,14 +220,16 @@ namespace Polygon.ColorPicker.ViewModels
 
             var hexFinder = new HexFinder(_nostalePath, ColorDisplayContent);
 
-            if (!hexFinder.ReplaceColorPattern(pattern, color))
+            if (!hexFinder.ReplaceColorPattern(pattern, substringIndex))
             {
-                MessageBox.Show("An error occurred !");
+                MessageBox.Show("An error occurred !\nplease reset settings and/or restore a backup of your launcher !");
                 return;
             }
 
             SettingsManager.AddOrUpdateAppSettings(appSettingKey, ColorDisplayContent);
             MessageBox.Show("Backup created, value changed successfully !");
         }
+
+        #endregion
     }
 }

@@ -27,12 +27,13 @@ namespace Polygon.Utils
             _byteHex = new List<byte[]>();
         }
 
-        public bool ReplaceColorPattern(string colorPattern, string color)
+        public bool ReplaceColorPattern(string colorPattern, int substringIndex)
         {
             var byteData = Deserialization.ReadFully(new FileStream(_nostalePath, FileMode.Open));
             _oldHexToString.Add(byteData.ToHexString());
 
-            if (!_oldHexToString.Any(s => s.Contains(colorPattern)))
+            var currentInfo = _oldHexToString.FirstOrDefault(s => s.Contains(colorPattern));
+            if (currentInfo == null)
             {
                 return false;
             }
@@ -41,7 +42,7 @@ namespace Polygon.Utils
             {
                 for (var i = 0; i < _oldHexToString.Count; i++)
                 {
-                    _oldHexToString[i] = _oldHexToString[i].Replace(color, _newColor);
+                    _oldHexToString[i] = _oldHexToString[i].Replace(colorPattern, $"{colorPattern.Substring(0, substringIndex)}{_newColor}");
                     _newHexToString.Add(_oldHexToString[i]);
                 }
 

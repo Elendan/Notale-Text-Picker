@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -11,7 +10,6 @@ namespace Polygon.Utils
 {
     public class HexFinder
     {
-        private readonly string _oldColor = ConfigurationManager.AppSettings["CurrentColor"];
         private readonly string _nostalePath;
         private readonly string _newColor;
 
@@ -29,12 +27,12 @@ namespace Polygon.Utils
             _byteHex = new List<byte[]>();
         }
 
-        public bool ReplaceColorPattern()
+        public bool ReplaceColorPattern(string colorPattern, string color)
         {
             var byteData = Deserialization.ReadFully(new FileStream(_nostalePath, FileMode.Open));
             _oldHexToString.Add(byteData.ToHexString());
 
-            if (!_oldHexToString.Any(s => s.Contains($"00FFFFFF{_oldColor}0000009F")))
+            if (!_oldHexToString.Any(s => s.Contains(colorPattern)))
             {
                 return false;
             }
@@ -43,7 +41,7 @@ namespace Polygon.Utils
             {
                 for (var i = 0; i < _oldHexToString.Count; i++)
                 {
-                    _oldHexToString[i] = _oldHexToString[i].Replace(_oldColor, _newColor);
+                    _oldHexToString[i] = _oldHexToString[i].Replace(color, _newColor);
                     _newHexToString.Add(_oldHexToString[i]);
                 }
 

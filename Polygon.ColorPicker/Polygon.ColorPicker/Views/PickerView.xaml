@@ -11,5 +11,6 @@
         <Button Command="{Binding ChooseColorCommand}" Content="{Binding PickerButtonContent}" HorizontalAlignment="Left" Height="27" Margin="21,24,0,0" VerticalAlignment="Top" Width="115"/>
         <TextBox HorizontalAlignment="Left" Margin="175,24,0,0" TextWrapping="NoWrap" Text="{Binding ColorDisplayContent}" Foreground="{Binding ColorBrush}" VerticalAlignment="Top" Height="27" Width="136"/>
         <Button Command="{Binding ChangeGmTagCommand}" Content="{Binding ChangeGmTagButtonContent}" HorizontalAlignment="Left" Height="27" Margin="21,87,0,0" VerticalAlignment="Top" Width="115"/>
+        <Button Command="{Binding ChangePrincipalRightClickTextCommand}" Content="{Binding ChangePrincipalRightClickTextContent}" HorizontalAlignment="Left" Height="27" Margin="175,87,0,0" VerticalAlignment="Top" Width="136" RenderTransformOrigin="0.13,0.667"/>
     </Grid>
 </UserControl>

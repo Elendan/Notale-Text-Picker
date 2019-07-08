@@ -20,7 +20,7 @@ namespace Polygon.Utils.Extensions
 
         public static IEnumerable<string> SplitInParts(this string s, int partLength)
         {
-            if (s == null)
+            if (string.IsNullOrEmpty(s))
             {
                 throw new ArgumentNullException(nameof(s));
             }

@@ -26,10 +26,10 @@ namespace Polygon.ColorPicker.ViewModels
             }
 
             this.InitializeKeys();
-            var data = ConfigurationManager.AppSettings["NostaleClientXPath"];
+            var data = ConfigurationManager.AppSettings["LauncherPath"];
             if (string.IsNullOrEmpty(data) || !File.Exists(data))
             {
-                MessageBox.Show("Please choose your NostaleClientX.exe");
+                MessageBox.Show("Please choose your Launcher");
                 var dlg = new OpenFileDialog
                 {
                     Filter = EXE_FILTER
@@ -37,7 +37,7 @@ namespace Polygon.ColorPicker.ViewModels
                 if (dlg.ShowDialog() == DialogResult.OK)
                 {
                     _nostalePath = dlg.FileName;
-                    SettingsManager.AddOrUpdateAppSettings("NostaleClientXPath", dlg.FileName);
+                    SettingsManager.AddOrUpdateAppSettings("LauncherPath", dlg.FileName);
                 }
             }
             else
@@ -50,7 +50,7 @@ namespace Polygon.ColorPicker.ViewModels
 
         public static bool IsAdministrator => new WindowsPrincipal(WindowsIdentity.GetCurrent()).IsInRole(WindowsBuiltInRole.Administrator);
 
-        private const string EXE_FILTER = "Executable (NostaleClientX.exe)|NostaleClientX.exe";
+        private const string EXE_FILTER = "Executable (*.exe)|*.exe";
 
         private string _changeGmTagButtonContent;
 
@@ -128,7 +128,7 @@ namespace Polygon.ColorPicker.ViewModels
             {
                 return _changeGmTagCommand ?? (_changeGmTagCommand = new RelayCommand(x =>
                 {
-                    var backupName = "LauncherBackup";
+                    const string backupName = "LauncherBackup";
                     var directory = _nostalePath.FindDirectory();
 
                     if (!Directory.Exists(directory + backupName))
@@ -141,8 +141,16 @@ namespace Polygon.ColorPicker.ViewModels
                     Directory.CreateDirectory(currentDirectoryTime);
 
                     File.Copy(_nostalePath, currentDirectoryTime + $"\\{_nostalePath.Split('\\').Last()}", true);
+                    var hexFinder = new HexFinder(_nostalePath, ColorDisplayContent);
 
-                    MessageBox.Show(directory + DateTime.Now.ToString("yyyyMdd_HH:mm:ss"));
+                    if (!hexFinder.ReplaceColorPattern())
+                    {
+                        MessageBox.Show("An error occurred !");
+                        return;
+                    }
+
+                    SettingsManager.AddOrUpdateAppSettings("CurrentColor", ColorDisplayContent);
+                    MessageBox.Show("Backup created, value changed successfully !");
                 }));
             }
         }

@@ -144,7 +144,7 @@ namespace Polygon.ColorPicker.ViewModels
             {
                 return _changeGmTagCommand ?? (_changeGmTagCommand = new RelayCommand(x =>
                 {
-                    UpdateInformationFromPattern($"00FFFFFF{_oldGmColor}0000009F", _oldGmColor);
+                    UpdateInformationFromPattern("CurrentGmColor", $"00FFFFFF{_oldGmColor}0000009F", _oldGmColor);
                 }));
             }
         }
@@ -157,12 +157,12 @@ namespace Polygon.ColorPicker.ViewModels
             {
                 return _changePrincipalRightClickTextCommand ?? (_changePrincipalRightClickTextCommand = new RelayCommand(x =>
                 {
-                    UpdateInformationFromPattern($"C7466F{_oldRightClickColor}C6466E", _oldRightClickColor);
+                    UpdateInformationFromPattern("CurrentRightClickColor", $"C7466F{_oldRightClickColor}C6466E", _oldRightClickColor);
                 }));
             }
         }
 
-        private void UpdateInformationFromPattern(string appSettingKey, string pattern)
+        private void UpdateInformationFromPattern(string appSettingKey, string pattern, string color)
         {
             const string backupName = "LauncherBackup";
             var directory = _nostalePath.FindDirectory();
@@ -180,7 +180,7 @@ namespace Polygon.ColorPicker.ViewModels
 
             var hexFinder = new HexFinder(_nostalePath, ColorDisplayContent);
 
-            if (!hexFinder.ReplaceColorPattern(pattern, _oldRightClickColor))
+            if (!hexFinder.ReplaceColorPattern(pattern, color))
             {
                 MessageBox.Show("An error occurred !");
                 return;

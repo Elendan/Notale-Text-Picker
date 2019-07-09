@@ -8,14 +8,16 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <Grid d:DataContext="{d:DesignInstance viewModels:PickerViewModel}">
-        <Button Command="{Binding ChooseColorCommand}" Content="{Binding PickerButtonContent}" HorizontalAlignment="Left" Height="27" Margin="21,112,0,0" VerticalAlignment="Top" Width="115"/>
-        <TextBox HorizontalAlignment="Left" Margin="175,112,0,0" TextWrapping="NoWrap" Text="{Binding ColorDisplayContent}" Foreground="{Binding ColorBrush}" VerticalAlignment="Top" Height="27" Width="136"/>
-        <Button Command="{Binding ChangeGmTagCommand}" Content="{Binding ChangeGmTagButtonContent}" HorizontalAlignment="Left" Height="27" Margin="21,154,0,0" VerticalAlignment="Top" Width="115"/>
-        <Button Command="{Binding ChangeRightClickColorCommand}" Content="{Binding ChangeRightClickColorContent}" HorizontalAlignment="Left" Height="27" Margin="175,154,0,0" VerticalAlignment="Top" Width="136" RenderTransformOrigin="0.13,0.667"/>
         <Menu HorizontalAlignment="Left" Height="21" VerticalAlignment="Top" Width="57">
             <MenuItem Header="Options" Width="57" Height="21">
                 <MenuItem Header="Reset options" Command="{Binding ResetOptionsCommand}"/>
             </MenuItem>
         </Menu>
+        <Button Command="{Binding ChooseColorCommand}" Content="{Binding PickerButtonContent}" HorizontalAlignment="Left" Height="27" Margin="21,112,0,0" VerticalAlignment="Top" Width="115"/>
+        <TextBox HorizontalAlignment="Left" Margin="175,112,0,0" TextWrapping="NoWrap" Text="{Binding ColorDisplayContent}" Foreground="{Binding ColorBrush}" VerticalAlignment="Top" Height="27" Width="136"/>
+        <Button Command="{Binding ChangeGmTagCommand}" Content="{Binding ChangeGmTagButtonContent}" HorizontalAlignment="Left" Height="27" Margin="21,154,0,0" VerticalAlignment="Top" Width="115"/>
+        <Button Command="{Binding ChangeRightClickColorCommand}" Content="{Binding ChangeRightClickColorContent}" HorizontalAlignment="Left" Height="27" Margin="175,154,0,0" VerticalAlignment="Top" Width="136" RenderTransformOrigin="0.13,0.667"/>
+        <ComboBox ItemsSource="{Binding FamilyLevels}" DisplayMemberPath="Key" SelectedItem="{Binding SelectedFamilyLevel}" SelectedValuePath="HexValue" HorizontalAlignment="Left" Margin="335,112,0,0" VerticalAlignment="Top" Width="120" Height="27"/>
+        <Button Command="{Binding ChangeFamilyLevelColorCommand}" Content="{Binding ChangeFamilyLevelColorContent}" HorizontalAlignment="Left" Height="27" Margin="335,154,0,0" VerticalAlignment="Top" Width="136" RenderTransformOrigin="0.13,0.667"/>
     </Grid>
 </UserControl>

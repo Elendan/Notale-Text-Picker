@@ -11,6 +11,7 @@ using Polygon.ColorPicker.Events;
 using Polygon.ColorPicker.Interfaces;
 using Polygon.Models.Enums;
 using Polygon.ColorPicker.Extensions;
+using Polygon.ColorPicker.Models;
 using Polygon.Utils;
 using Polygon.Utils.Extensions;
 
@@ -55,6 +56,8 @@ namespace Polygon.ColorPicker.ViewModels
 
         #region Members
 
+        private string GetOldFamilyLevelFromLevel(string level) => ConfigurationManager.AppSettings[level];
+
         private string _oldRightClickColor => ConfigurationManager.AppSettings["CurrentRightClickColor"];
 
         private string _oldGmColor => ConfigurationManager.AppSettings["CurrentGmColor"];
@@ -68,6 +71,42 @@ namespace Polygon.ColorPicker.ViewModels
         #endregion
 
         #region UpdateableProperties
+
+        private FamilyLevelModel _selectedFamilyLevel;
+
+        public FamilyLevelModel SelectedFamilyLevel
+        {
+            get => _selectedFamilyLevel;
+            set
+            {
+                _selectedFamilyLevel = value;
+                OnPropertyChanged(nameof(SelectedFamilyLevel));
+            }
+        }
+
+        private ObservableCollection<FamilyLevelModel> _familyLevels;
+
+        public ObservableCollection<FamilyLevelModel> FamilyLevels
+        {
+            get => _familyLevels;
+            set
+            {
+                _familyLevels = value;
+                OnPropertyChanged(nameof(FamilyLevels));
+            }
+        }
+
+        private string _changeFamilyLevelColorContent;
+
+        public string ChangeFamilyLevelColorContent
+        {
+            get => _changeFamilyLevelColorContent;
+            set
+            {
+                _changeFamilyLevelColorContent = value;
+                OnPropertyChanged(nameof(ChangeFamilyLevelColorContent));
+            }
+        }
 
         private string _changeRightClickColorContent;
 
@@ -177,6 +216,21 @@ namespace Polygon.ColorPicker.ViewModels
                 {
                     var previous = "C7466F";
                     UpdateInformationFromPattern("CurrentRightClickColor", $"{previous}{_oldRightClickColor}", previous.Length);
+                }));
+            }
+        }
+
+        private ICommand _changeFamilyLevelColorCommand;
+
+        public ICommand ChangeFamilyLevelColorCommand
+        {
+            get
+            {
+                return _changeFamilyLevelColorCommand ?? (_changeFamilyLevelColorCommand = new RelayCommand(x =>
+                {
+                    var previous = "0000009F99FFFFFF";
+                    UpdateInformationFromPattern(SelectedFamilyLevel.Key,
+                        previous + GetOldFamilyLevelFromLevel(SelectedFamilyLevel.Key), previous.Length);
                 }));
             }
         }
